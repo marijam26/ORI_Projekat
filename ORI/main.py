@@ -7,8 +7,8 @@ import seaborn as sns
 from keras.preprocessing import image
 from keras.utils.np_utils import to_categorical
 from keras.applications.imagenet_utils import preprocess_input
-from keras.utils.np_utils import to_categorical # convert to one-hot-encoding
-from keras.models import Sequential # to create a cnn model
+from keras.utils.np_utils import to_categorical
+from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPool2D, BatchNormalization, Activation, MaxPooling2D, \
     AveragePooling2D
 from keras.optimizers import RMSprop,Adam
@@ -71,6 +71,8 @@ if __name__ == '__main__':
     print(y_train.shape)
     print(y_train)
 
+    model = keras.models.load_model("MyModel")
+
     mod = Sequential()
 
     mod.add(Conv2D(32, (7, 7), strides=(1, 1), name='conv0', input_shape=(100, 100, 3)))
@@ -89,36 +91,12 @@ if __name__ == '__main__':
     mod.add(Dense(4251, activation='softmax', name='sm'))
     mod.compile(loss='categorical_crossentropy', optimizer="adam", metrics=['accuracy'])
     history = mod.fit(x_train, y_train, epochs=100, batch_size=100, verbose=1)
+    mod.save("MyModel")
     gc.collect()
 
-    # model = Sequential()
-    #
-    # model.add(Conv2D(filters=16, kernel_size=(5, 5), padding='Same', activation='relu', input_shape=(100, 100, 3)))
-    # model.add(Conv2D(filters=16, kernel_size=(5, 5), padding='Same', activation='relu'))
-    # model.add(MaxPool2D(pool_size=(2, 2)))
-    # model.add(Dropout(0.25))
-    #
-    # model.add(Conv2D(filters=32, kernel_size=(3, 3), padding='Same', activation='relu'))
-    # model.add(Conv2D(filters=32, kernel_size=(3, 3), padding='Same', activation='relu'))
-    # model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
-    # model.add(Dropout(0.25))
-    #
-    # model.add(Conv2D(filters=64, kernel_size=(3, 3), padding='Same', activation='relu'))
-    # model.add(Conv2D(filters=64, kernel_size=(3, 3), padding='Same', activation='relu'))
-    # model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
-    # model.add(Dropout(0.25))
-    #
-    # fully connected
-    # model.add(Flatten())
-    # model.add(Dense(256, activation='relu'))
-    # model.add(BatchNormalization())
-    # model.add(Dense(y_train.shape[1], activation="softmax"))
-    # model.summary()
-    #optimizer = Adam(lr = 0.001, beta_1 = 0.9, beta_2 = 0.999)
-    #learning_rate_reduction = ReduceLROnPlateau(monitor='val_acc',
-                                                #patience=3,
-                                                #verbose=1,
-                                                #factor=0.5,
-                                                #min_lr=0.00001)
-    #model.compile(optimizer = optimizer, loss = "categorical_crossentropy", metrics=["accuracy"])
-    #history = model.fit(x_train, y_train, epochs=100, batch_size=100, verbose=2, callbacks=[learning_rate_reduction])
+    plt.plot(history.history['acc'], color='g', label="Train Accuracy")
+    plt.title("Train Accuracy")
+    plt.xlabel("Number of Epochs")
+    plt.ylabel("Accuracy")
+    plt.legend()
+    plt.show()
